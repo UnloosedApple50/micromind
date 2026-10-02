@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroMind — Agente Empresarial</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>🧠 MicroMind</h1>
+                <p class="subtitle">Agente Empresarial Ultraleve</p>
+            </div>
+
+            <!-- Navigation -->
+            <div class="sidebar-section">
+                <h3>Módulos</h3>
+                <div class="nav-list">
+                    <button class="nav-btn active" data-page="dashboard" onclick="showPage('dashboard')">
+                        📊 Dashboard
+                    </button>
+                    <button class="nav-btn" data-page="contacts" onclick="showPage('contacts')">
+                        👥 Contactos
+                    </button>
+                    <button class="nav-btn" data-page="tasks" onclick="showPage('tasks')">
+                        📋 Tarefas
+                    </button>
+                    <button class="nav-btn" data-page="tickets" onclick="showPage('tickets')">
+                        🎫 Tickets
+                    </button>
+                    <button class="nav-btn" data-page="ai" onclick="showPage('ai')">
+                        🤖 MicroAI
+                    </button>
+                    <button class="nav-btn" data-page="automation" onclick="showPage('automation')">
+                        ⚙️ Automação
+                    </button>
+                    <button class="nav-btn" data-page="telephony" onclick="showPage('telephony')">
+                        📞 Telefonia
+                    </button>
+                    <button class="nav-btn" data-page="settings" onclick="showPage('settings')">
+                        ⚙️ Configuração
+                    </button>
+                    <button class="nav-btn" data-page="doctor" onclick="showPage('doctor')">
+                        🩺 Doctor
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="status-indicator" id="status">
+                    <span class="dot"></span>
+                    <span class="status-text">Conectando...</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard -->
+            <div class="page active" id="page-dashboard">
+                <h2>Dashboard</h2>
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>Perfil</h3>
+                        <p id="profile-value">Carregando...</p>
+                    </div>
+                    <div class="card">
+                        <h3>Estado</h3>
+                        <p id="status-value">Carregando...</p>
+                    </div>
+                    <div class="card">
+                        <h3>Armazenamento</h3>
+                        <p id="storage-value">Carregando...</p>
+                    </div>
+                    <div class="card">
+                        <h3>Segurança</h3>
+                        <p id="security-value">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contacts -->
+            <div class="page" id="page-contacts">
+                <h2>Contactos</h2>
+                <div class="form-group">
+                    <input type="text" id="contact-name" placeholder="Nome">
+                    <input type="email" id="contact-email" placeholder="Email">
+                    <input type="tel" id="contact-phone" placeholder="Telefone">
+                    <input type="text" id="contact-company" placeholder="Empresa">
+                    <button onclick="createContact()">Adicionar</button>
+                </div>
+                <div class="list" id="contacts-list"></div>
+            </div>
+
+            <!-- Tasks -->
+            <div class="page" id="page-tasks">
+                <h2>Tarefas</h2>
+                <div class="form-group">
+                    <input type="text" id="task-title" placeholder="Título">
+                    <input type="text" id="task-description" placeholder="Descrição">
+                    <select id="task-priority">
+                        <option value="low">Baixa</option>
+                        <option value="medium">Média</option>
+                        <option value="high">Alta</option>
+                        <option value="urgent">Urgente</option>
+                    </select>
+                    <button onclick="createTask()">Adicionar</button>
+                </div>
+                <div class="list" id="tasks-list"></div>
+            </div>
+
+            <!-- Tickets -->
+            <div class="page" id="page-tickets">
+                <h2>Tickets</h2>
+                <div class="form-group">
+                    <input type="text" id="ticket-title" placeholder="Título">
+                    <input type="text" id="ticket-customer" placeholder="Cliente">
+                    <select id="ticket-priority">
+                        <option value="low">Baixa</option>
+                        <option value="medium">Média</option>
+                        <option value="high">Alta</option>
+                        <option value="urgent">Urgente</option>
+                    </select>
+                    <button onclick="createTicket()">Criar</button>
+                </div>
+                <div class="list" id="tickets-list"></div>
+            </div>
+
+            <!-- AI -->
+            <div class="page" id="page-ai">
+                <h2>MicroAI</h2>
+                <div class="chat-container">
+                    <div class="chat-messages" id="ai-messages">
+                        <div class="message assistant">
+                            <div class="message-content">
+                                <p>Olá! Sou o MicroAI. Posso classificar intenções, extrair entidades e sugerir ações. Como posso ajudar?</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="ai-input" placeholder="Ex: Recebi uma oferta de 2000 euros pelo equipamento X" onkeydown="if(event.key==='Enter')sendAIMessage()">
+                        <button onclick="sendAIMessage()">Enviar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Automation -->
+            <div class="page" id="page-automation">
+                <h2>Automação</h2>
+                <div class="card">
+                    <h3>Regras WHEN/IF/THEN</h3>
+                    <p>As regras de automação permitem automatizar tarefas empresariais.</p>
+                    <div class="list" id="automations-list"></div>
+                </div>
+            </div>
+
+            <!-- Telephony -->
+            <div class="page" id="page-telephony">
+                <h2>Telefonia</h2>
+                <div class="card">
+                    <h3>Simulação de Chamada</h3>
+                    <p>Teste o fluxo de chamada sem fazer chamadas reais.</p>
+                    <button onclick="simulateCall()">Simular Chamada</button>
+                    <div id="call-result"></div>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="page" id="page-settings">
+                <h2>Configuração</h2>
+                <div class="settings-grid">
+                    <div class="card">
+                        <h3>Perfil de Execução</h3>
+                        <select id="config-profile" onchange="updateConfig('profile', this.value)">
+                            <option value="ULTRA_LOW">ULTRA_LOW (Pentium III, 256MB)</option>
+                            <option value="LEGACY">LEGACY (Pentium 4, 512MB)</option>
+                            <option value="LOW">LOW (Core 2, 2GB)</option>
+                            <option value="STANDARD">STANDARD (i3, 8GB)</option>
+                            <option value="HIGH">HIGH (i7, 32GB)</option>
+                            <option value="SERVER">SERVER (Xeon, 128GB)</option>
+                        </select>
+                    </div>
+                    <div class="card">
+                        <h3>IA</h3>
+                        <label>Provider</label>
+                        <select id="config-ai-provider" onchange="updateConfig('ai', {provider: this.value})">
+                            <option value="NoAIProvider">Sem IA</option>
+                            <option value="RuleBasedAI">Baseado em Regras</option>
+                            <option value="MicroAIProvider">MicroAI (leve)</option>
+                            <option value="LocalLLMProvider">LLM Local (Ollama)</option>
+                            <option value="RemoteAPIProvider">API Remota</option>
+                            <option value="GatewayProvider">Via Gateway</option>
+                        </select>
+                        <label>Modelo</label>
+                        <input type="text" id="config-ai-model" placeholder="qwen2.5:0.5b" onchange="updateConfig('ai', {model: this.value})">
+                        <label>Temperatura</label>
+                        <input type="number" id="config-ai-temp" min="0" max="1" step="0.1" value="0.3" onchange="updateConfig('ai', {temperature: parseFloat(this.value)})">
+                        <label>Max Tokens</label>
+                        <input type="number" id="config-ai-tokens" min="64" max="8192" value="512" onchange="updateConfig('ai', {max_tokens: parseInt(this.value)})">
+                    </div>
+                    <div class="card">
+                        <h3>Armazenamento</h3>
+                        <label>Backend</label>
+                        <select id="config-storage-backend" onchange="updateConfig('storage', {backend: this.value})">
+                            <option value="FlatFileBackend">Flat File (ULTRA_LOW)</option>
+                            <option value="SQLiteBackend">SQLite (LOW+)</option>
+                            <option value="RemoteBackend">Remoto (Gateway)</option>
+                        </select>
+                        <label>Diretório</label>
+                        <input type="text" id="config-storage-dir" placeholder="./data" onchange="updateConfig('storage', {data_dir: this.value})">
+                        <label>Max KB</label>
+                        <input type="number" id="config-storage-max" min="1024" max="1048576" value="2048" onchange="updateConfig('storage', {max_storage_kb: parseInt(this.value)})">
+                    </div>
+                    <div class="card">
+                        <h3>Segurança</h3>
+                        <label>Safe Mode</label>
+                        <input type="checkbox" id="config-safe-mode" checked onchange="updateConfig('security', {safe_mode: this.checked})">
+                        <label>Permissões</label>
+                        <select id="config-permissions" onchange="updateConfig('security', {permissions: this.value})">
+                            <option value="ADMIN">Admin</option>
+                            <option value="MANAGER">Manager</option>
+                            <option value="USER">User</option>
+                            <option value="READ_ONLY">Read Only</option>
+                            <option value="SERVICE">Service</option>
+                        </select>
+                        <label>Telemetria</label>
+                        <input type="checkbox" id="config-telemetry" onchange="updateConfig('security', {telemetry: this.checked})">
+                    </div>
+                    <div class="card">
+                        <h3>Telefonia</h3>
+                        <label>Provider</label>
+                        <select id="config-telephony-provider" onchange="updateConfig('telephony', {provider: this.value})">
+                            <option value="DisabledTelephony">Desativado</option>
+                            <option value="GatewayTelephony">Via Gateway</option>
+                            <option value="SIPTelephony">SIP Direto</option>
+                            <option value="CloudTelephony">Cloud</option>
+                        </select>
+                        <label>Política</label>
+                        <select id="config-telephony-policy" onchange="updateConfig('telephony', {policy: this.value})">
+                            <option value="AUTO_CALL">Auto Call</option>
+                            <option value="CONFIRM_CALL">Confirm Call</option>
+                            <option value="BLOCK_CALL">Block Call</option>
+                        </select>
+                        <label>Horário (início)</label>
+                        <input type="number" id="config-telephony-start" min="0" max="23" value="9" onchange="updateConfig('telephony', {business_hours: [parseInt(this.value), parseInt(document.getElementById('config-telephony-end').value)]})">
+                        <label>Horário (fim)</label>
+                        <input type="number" id="config-telephony-end" min="0" max="23" value="18" onchange="updateConfig('telephony', {business_hours: [parseInt(document.getElementById('config-telephony-start').value), parseInt(this.value)]})">
+                        <label>Max chamadas/hora</label>
+                        <input type="number" id="config-telephony-hourly" min="1" max="100" value="10" onchange="updateConfig('telephony', {max_calls_per_hour: parseInt(this.value)})">
+                        <label>Max chamadas/dia</label>
+                        <input type="number" id="config-telephony-daily" min="1" max="500" value="50" onchange="updateConfig('telephony', {max_calls_per_day: parseInt(this.value)})">
+                    </div>
+                    <div class="card">
+                        <h3>Gateway</h3>
+                        <label>Ativo</label>
+                        <input type="checkbox" id="config-gateway-enabled" onchange="updateConfig('gateway', {enabled: this.checked})">
+                        <label>URL</label>
+                        <input type="text" id="config-gateway-url" placeholder="https://gw.exemplo.com" onchange="updateConfig('gateway', {url: this.value})">
+                        <label>Token</label>
+                        <input type="password" id="config-gateway-token" placeholder="Token de autenticação" onchange="updateConfig('gateway', {token: this.value})">
+                    </div>
+                    <div class="card">
+                        <h3>Email</h3>
+                        <label>Ativo</label>
+                        <input type="checkbox" id="config-email-enabled" onchange="updateConfig('email', {enabled: this.checked})">
+                        <label>SMTP Host</label>
+                        <input type="text" id="config-email-host" placeholder="smtp.gmail.com" onchange="updateConfig('email', {smtp_host: this.value})">
+                        <label>SMTP Port</label>
+                        <input type="number" id="config-email-port" min="1" max="65535" value="587" onchange="updateConfig('email', {smtp_port: parseInt(this.value)})">
+                        <label>Utilizador</label>
+                        <input type="text" id="config-email-user" placeholder="user@empresa.com" onchange="updateConfig('email', {smtp_user: this.value})">
+                        <label>Password</label>
+                        <input type="password" id="config-email-pass" placeholder="••••••••" onchange="updateConfig('email', {smtp_pass: this.value})">
+                    </div>
+                    <div class="card">
+                        <h3>Rede</h3>
+                        <label>Connect Timeout (s)</label>
+                        <input type="number" id="config-net-connect" min="1" max="60" value="10" onchange="updateConfig('networking', {connect_timeout: parseInt(this.value)})">
+                        <label>Read Timeout (s)</label>
+                        <input type="number" id="config-net-read" min="1" max="120" value="30" onchange="updateConfig('networking', {read_timeout: parseInt(this.value)})">
+                        <label>Write Timeout (s)</label>
+                        <input type="number" id="config-net-write" min="1" max="120" value="30" onchange="updateConfig('networking', {write_timeout: parseInt(this.value)})">
+                        <label>Max Retries</label>
+                        <input type="number" id="config-net-retries" min="0" max="10" value="3" onchange="updateConfig('networking', {max_retries: parseInt(this.value)})">
+                    </div>
+                    <div class="card">
+                        <h3>Logging</h3>
+                        <label>Nível</label>
+                        <select id="config-log-level" onchange="updateConfig('logging', {level: this.value})">
+                            <option value="ERROR">ERROR</option>
+                            <option value="WARN">WARN</option>
+                            <option value="INFO">INFO</option>
+                            <option value="DEBUG">DEBUG</option>
+                            <option value="AUDIT">AUDIT</option>
+                        </select>
+                        <label>Ficheiro</label>
+                        <input type="text" id="config-log-file" placeholder="./logs/micromind.log" onchange="updateConfig('logging', {file: this.value})">
+                        <label>Redact Secrets</label>
+                        <input type="checkbox" id="config-log-redact" checked onchange="updateConfig('logging', {redact_secrets: this.checked})">
+                    </div>
+                </div>
+                <div class="settings-actions">
+                    <button class="btn-reset" onclick="resetConfig()">Repor Padrões</button>
+                    <button class="btn-save" onclick="saveConfig()">Guardar Configuração</button>
+                </div>
+            </div>
+
+            <!-- Doctor -->
+            <div class="page" id="page-doctor">
+                <h2>Doctor</h2>
+                <div class="card">
+                    <h3>Diagnóstico do Sistema</h3>
+                    <div id="doctor-results"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let currentPage = 'dashboard';
+
+        async function init() {
+            await checkHealth();
+            await loadDashboard();
+            setInterval(checkHealth, 10000);
+        }
+
+        async function checkHealth() {
+            try {
+                const resp = await fetch('/api/health');
+                const data = await resp.json();
+                const statusEl = document.getElementById('status');
+                const dot = statusEl.querySelector('.dot');
+                const text = statusEl.querySelector('.status-text');
+
+                if (data.status === 'ok') {
+                    dot.className = 'dot online';
+                    text.textContent = `Online • ${data.profile}`;
+                } else {
+                    dot.className = 'dot offline';
+                    text.textContent = 'Offline';
+                }
+            } catch (e) {
+                const statusEl = document.getElementById('status');
+                statusEl.querySelector('.dot').className = 'dot offline';
+                statusEl.querySelector('.status-text').textContent = 'Erro de conexão';
+            }
+        }
+
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+            document.querySelector(`[data-page="${page}"]`).classList.add('active');
+            currentPage = page;
+
+            if (page === 'dashboard') loadDashboard();
+            if (page === 'contacts') loadContacts();
+            if (page === 'tasks') loadTasks();
+            if (page === 'tickets') loadTickets();
+            if (page === 'automation') loadAutomations();
+            if (page === 'settings') loadSettings();
+            if (page === 'doctor') loadDoctor();
+        }
+
+        async function loadDashboard() {
+            try {
+                const resp = await fetch('/api/status');
+                const data = await resp.json();
+                document.getElementById('profile-value').textContent = data.profile || 'Unknown';
+                document.getElementById('status-value').textContent = data.core || 'Unknown';
+                document.getElementById('storage-value').textContent = data.storage || 'Unknown';
+                document.getElementById('security-value').textContent = data.security || 'Unknown';
+            } catch (e) {
+                console.error('Failed to load dashboard:', e);
+            }
+        }
+
+        async function loadContacts() {
+            try {
+                const resp = await fetch('/api/contacts');
+                const data = await resp.json();
+                const list = document.getElementById('contacts-list');
+                list.innerHTML = '';
+                data.contacts.forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = 'list-item';
+                    div.textContent = c;
+                    list.appendChild(div);
+                });
+            } catch (e) {
+                console.error('Failed to load contacts:', e);
+            }
+        }
+
+        async function createContact() {
+            const name = document.getElementById('contact-name').value;
+            const email = document.getElementById('contact-email').value;
+            const phone = document.getElementById('contact-phone').value;
+            const company = document.getElementById('contact-company').value;
+
+            try {
+                const resp = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, phone, company }),
+                });
+                const data = await resp.json();
+                if (data.status === 'ok') {
+                    alert('Contacto criado!');
+                    loadContacts();
+                } else {
+                    alert('Erro: ' + data.error);
+                }
+            } catch (e) {
+                alert('Erro: ' + e.message);
+            }
+        }
+
+        async function loadTasks() {
+            try {
+                const resp = await fetch('/api/tasks');
+                const data = await resp.json();
+                const list = document.getElementById('tasks-list');
+                list.innerHTML = '';
+                data.tasks.forEach(t => {
+                    const div = document.createElement('div');
+                    div.className = 'list-item';
+                    div.textContent = t;
+                    list.appendChild(div);
+                });
+            } catch (e) {
+                console.error('Failed to load tasks:', e);
+            }
+        }
+
+        async function createTask() {
+            const title = document.getElementById('task-title').value;
+            const description = document.getElementById('task-description').value;
+            const priority = document.getElementById('task-priority').value;
+
+            try {
+                const resp = await fetch('/api/task', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description, priority }),
+                });
+                const data = await resp.json();
+                if (data.status === 'ok') {
+                    alert('Tarefa criada!');
+                    loadTasks();
+                } else {
+                    alert('Erro: ' + data.error);
+                }
+            } catch (e) {
+                alert('Erro: ' + e.message);
+            }
+        }
+
+        async function loadTickets() {
+            try {
+                const resp = await fetch('/api/tickets');
+                const data = await resp.json();
+                const list = document.getElementById('tickets-list');
+                list.innerHTML = '';
+                data.tickets.forEach(t => {
+                    const div = document.createElement('div');
+                    div.className = 'list-item';
+                    div.textContent = t;
+                    list.appendChild(div);
+                });
+            } catch (e) {
+                console.error('Failed to load tickets:', e);
+            }
+        }
+
+        async function createTicket() {
+            const title = document.getElementById('ticket-title').value;
+            const customer = document.getElementById('ticket-customer').value;
+            const priority = document.getElementById('ticket-priority').value;
+
+            try {
+                const resp = await fetch('/api/ticket', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, customer, priority }),
+                });
+                const data = await resp.json();
+                if (data.status === 'ok') {
+                    alert('Ticket criado!');
+                    loadTickets();
+                } else {
+                    alert('Erro: ' + data.error);
+                }
+            } catch (e) {
+                alert('Erro: ' + e.message);
+            }
+        }
+
+        async function sendAIMessage() {
+            const input = document.getElementById('ai-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const messagesEl = document.getElementById('ai-messages');
+            const userDiv = document.createElement('div');
+            userDiv.className = 'message user';
+            userDiv.innerHTML = `<div class="message-content"><p>${message}</p></div>`;
+            messagesEl.appendChild(userDiv);
+            input.value = '';
+
+            const aiDiv = document.createElement('div');
+            aiDiv.className = 'message assistant';
+            aiDiv.innerHTML = '<div class="message-content"><p>Analisando...</p></div>';
+            messagesEl.appendChild(aiDiv);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+
+            try {
+                const resp = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message }),
+                });
+                const data = await resp.json();
+
+                aiDiv.innerHTML = `
+                    <div class="message-content">
+                        <p><strong>Intenção:</strong> ${data.intent}</p>
+                        <p><strong>Confiança:</strong> ${(data.confidence * 100).toFixed(0)}%</p>
+                        <p><strong>Ação:</strong> ${data.proposed_action}</p>
+                        <p><strong>Validação:</strong> ${data.validation}</p>
+                    </div>
+                `;
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            } catch (e) {
+                aiDiv.innerHTML = `<div class="message-content"><p>Erro: ${e.message}</p></div>`;
+            }
+        }
+
+        async function loadAutomations() {
+            try {
+                const resp = await fetch('/api/automations');
+                const data = await resp.json();
+                const list = document.getElementById('automations-list');
+                list.innerHTML = '';
+                data.automations.forEach(a => {
+                    const div = document.createElement('div');
+                    div.className = 'list-item';
+                    div.textContent = `${a.name} (${a.enabled ? 'Ativa' : 'Inativa'})`;
+                    list.appendChild(div);
+                });
+            } catch (e) {
+                console.error('Failed to load automations:', e);
+            }
+        }
+
+        async function simulateCall() {
+            try {
+                const resp = await fetch('/api/call/simulate');
+                const data = await resp.json();
+                document.getElementById('call-result').innerHTML = `
+                    <p><strong>Estado:</strong> ${data.status}</p>
+                    <p><strong>Resultado:</strong> ${data.result}</p>
+                    <p><strong>Mensagem:</strong> ${data.message}</p>
+                `;
+            } catch (e) {
+                document.getElementById('call-result').innerHTML = `<p>Erro: ${e.message}</p>`;
+            }
+        }
+
+        async function loadDoctor() {
+            try {
+                const resp = await fetch('/api/doctor');
+                const data = await resp.json();
+                const results = document.getElementById('doctor-results');
+                results.innerHTML = '';
+                for (const [key, value] of Object.entries(data)) {
+                    const div = document.createElement('div');
+                    div.className = 'doctor-item';
+                    div.innerHTML = `<strong>${key}:</strong> ${value}`;
+                    results.appendChild(div);
+                }
+            } catch (e) {
+                console.error('Failed to load doctor:', e);
+            }
+        }
+
+        // Settings
+        async function loadSettings() {
+            try {
+                const resp = await fetch('/api/config');
+                const config = await resp.json();
+
+                // Profile
+                document.getElementById('config-profile').value = config.profile || 'ULTRA_LOW';
+
+                // AI
+                document.getElementById('config-ai-provider').value = config.ai?.provider || 'MicroAIProvider';
+                document.getElementById('config-ai-model').value = config.ai?.model || 'qwen2.5:0.5b';
+                document.getElementById('config-ai-temp').value = config.ai?.temperature || 0.3;
+                document.getElementById('config-ai-tokens').value = config.ai?.max_tokens || 512;
+
+                // Storage
+                document.getElementById('config-storage-backend').value = config.storage?.backend || 'FlatFileBackend';
+                document.getElementById('config-storage-dir').value = config.storage?.data_dir || './data';
+                document.getElementById('config-storage-max').value = config.storage?.max_storage_kb || 2048;
+
+                // Security
+                document.getElementById('config-safe-mode').checked = config.security?.safe_mode !== false;
+                document.getElementById('config-permissions').value = config.security?.permissions || 'USER';
+                document.getElementById('config-telemetry').checked = config.security?.telemetry === true;
+
+                // Telephony
+                document.getElementById('config-telephony-provider').value = config.telephony?.provider || 'DisabledTelephony';
+                document.getElementById('config-telephony-policy').value = config.telephony?.policy || 'CONFIRM_CALL';
+                document.getElementById('config-telephony-start').value = config.telephony?.business_hours?.[0] ?? 9;
+                document.getElementById('config-telephony-end').value = config.telephony?.business_hours?.[1] ?? 18;
+                document.getElementById('config-telephony-hourly').value = config.telephony?.max_calls_per_hour || 10;
+                document.getElementById('config-telephony-daily').value = config.telephony?.max_calls_per_day || 50;
+
+                // Gateway
+                document.getElementById('config-gateway-enabled').checked = config.gateway?.enabled === true;
+                document.getElementById('config-gateway-url').value = config.gateway?.url || '';
+                document.getElementById('config-gateway-token').value = config.gateway?.token || '';
+
+                // Email
+                document.getElementById('config-email-enabled').checked = config.email?.enabled === true;
+                document.getElementById('config-email-host').value = config.email?.smtp_host || '';
+                document.getElementById('config-email-port').value = config.email?.smtp_port || 587;
+                document.getElementById('config-email-user').value = config.email?.smtp_user || '';
+                document.getElementById('config-email-pass').value = config.email?.smtp_pass || '';
+
+                // Networking
+                document.getElementById('config-net-connect').value = config.networking?.connect_timeout || 10;
+                document.getElementById('config-net-read').value = config.networking?.read_timeout || 30;
+                document.getElementById('config-net-write').value = config.networking?.write_timeout || 30;
+                document.getElementById('config-net-retries').value = config.networking?.max_retries || 3;
+
+                // Logging
+                document.getElementById('config-log-level').value = config.logging?.level || 'INFO';
+                document.getElementById('config-log-file').value = config.logging?.file || './logs/micromind.log';
+                document.getElementById('config-log-redact').checked = config.logging?.redact_secrets !== false;
+            } catch (e) {
+                console.error('Failed to load settings:', e);
+            }
+        }
+
+        async function updateConfig(section, data) {
+            try {
+                const resp = await fetch('/api/config', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ section, data }),
+                });
+                const result = await resp.json();
+                if (result.status === 'ok') {
+                    console.log('Config updated:', section);
+                } else {
+                    console.error('Config update failed:', result.error);
+                }
+            } catch (e) {
+                console.error('Config update error:', e);
+            }
+        }
+
+        async function saveConfig() {
+            try {
+                const resp = await fetch('/api/config');
+                const config = await resp.json();
+
+                // Save all sections
+                const sections = ['profile', 'ai', 'storage', 'security', 'telephony', 'gateway', 'email', 'networking', 'logging'];
+                for (const section of sections) {
+                    await updateConfig(section, config[section] || {});
+                }
+
+                alert('Configuração guardada com sucesso!');
+            } catch (e) {
+                alert('Erro ao guardar: ' + e.message);
+            }
+        }
+
+        async function resetConfig() {
+            if (!confirm('Repor configuração para padrões?')) return;
+            try {
+                const resp = await fetch('/api/config/reset', { method: 'POST' });
+                const result = await resp.json();
+                if (result.status === 'ok') {
+                    alert('Configuração reposta!');
+                    loadSettings();
+                }
+            } catch (e) {
+                alert('Erro: ' + e.message);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
