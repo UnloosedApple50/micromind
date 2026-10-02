@@ -389,6 +389,29 @@ body {
     border-bottom: none;
 }
 
+/* Tunnel */
+.tunnel-controls {
+    display: flex;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+#tunnel-url {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+#tunnel-url a {
+    text-decoration: none;
+}
+
+#tunnel-url a:hover {
+    text-decoration: underline;
+}
+
 /* Settings */
 .settings-grid {
     display: grid;

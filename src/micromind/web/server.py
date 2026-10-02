@@ -19,6 +19,7 @@ from micromind.ai.providers import MicroAIProvider
 from micromind.automation.engine import AutomationEngine
 from micromind.telephony.calls import CallManager, DisabledTelephony
 from micromind.web.settings import router as settings_router
+from micromind.web.tunnel import router as tunnel_router
 
 # Paths
 BASE_DIR = Path(__file__).parent.parent.parent.parent
@@ -29,6 +30,7 @@ STATIC_DIR = BASE_DIR / "src" / "micromind" / "web" / "static"
 app = FastAPI(title="MicroMind", version="1.0.0")
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 app.include_router(settings_router)
+app.include_router(tunnel_router)
 
 # Global state
 runtime: Optional[CoreRuntime] = None

@@ -43,6 +43,9 @@
                     <button class="nav-btn" data-page="settings" onclick="showPage('settings')">
                         ⚙️ Configuração
                     </button>
+                    <button class="nav-btn" data-page="tunnel" onclick="showPage('tunnel')">
+                        🌐 Tunnel
+                    </button>
                     <button class="nav-btn" data-page="doctor" onclick="showPage('doctor')">
                         🩺 Doctor
                     </button>
@@ -165,6 +168,30 @@
                     <p>Teste o fluxo de chamada sem fazer chamadas reais.</p>
                     <button onclick="simulateCall()">Simular Chamada</button>
                     <div id="call-result"></div>
+                </div>
+            </div>
+
+            <!-- Tunnel -->
+            <div class="page" id="page-tunnel">
+                <h2>Cloudflare Tunnel</h2>
+                <div class="card">
+                    <h3>Acesso Remoto</h3>
+                    <p>Crie um tunnel para acessar o MicroMind de qualquer lugar do mundo.</p>
+                    <div class="tunnel-controls">
+                        <button class="btn-save" onclick="startTunnel()">Iniciar Tunnel</button>
+                        <button class="btn-reset" onclick="stopTunnel()">Parar Tunnel</button>
+                    </div>
+                    <div id="tunnel-status"></div>
+                    <div id="tunnel-url"></div>
+                </div>
+                <div class="card">
+                    <h3>Como funciona</h3>
+                    <ol style="margin-left: 20px; line-height: 1.8;">
+                        <li>Clique em "Iniciar Tunnel"</li>
+                        <li>Aguarde alguns segundos</li>
+                        <li>Copie a URL gerada</li>
+                        <li>Compartilhe com quem quiser acessar</li>
+                    </ol>
                 </div>
             </div>
 
@@ -363,6 +390,7 @@
             if (page === 'tickets') loadTickets();
             if (page === 'automation') loadAutomations();
             if (page === 'settings') loadSettings();
+            if (page === 'tunnel') loadTunnelStatus();
             if (page === 'doctor') loadDoctor();
         }
 
@@ -585,6 +613,59 @@
                 }
             } catch (e) {
                 console.error('Failed to load doctor:', e);
+            }
+        }
+
+        // Tunnel
+        async function loadTunnelStatus() {
+            try {
+                const resp = await fetch('/api/tunnel/status');
+                const data = await resp.json();
+                if (data.running && data.url) {
+                    document.getElementById('tunnel-status').innerHTML = '<p style="color: var(--success);">✅ Tunnel ativo</p>';
+                    document.getElementById('tunnel-url').innerHTML = `
+                        <p><strong>URL de Acesso:</strong></p>
+                        <a href="${data.url}" target="_blank" style="color: var(--accent); font-size: 18px; word-break: break-all;">${data.url}</a>
+                    `;
+                } else {
+                    document.getElementById('tunnel-status').innerHTML = '<p style="color: var(--text-secondary);">Tunnel inativo</p>';
+                }
+            } catch (e) {
+                console.error('Failed to load tunnel status:', e);
+            }
+        }
+
+        async function startTunnel() {
+            try {
+                const resp = await fetch('/api/tunnel/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ port: 8081 }),
+                });
+                const data = await resp.json();
+                if (data.url) {
+                    document.getElementById('tunnel-url').innerHTML = `
+                        <p><strong>URL de Acesso:</strong></p>
+                        <a href="${data.url}" target="_blank" style="color: var(--accent); font-size: 18px; word-break: break-all;">${data.url}</a>
+                        <p><small>Copie esta URL e compartilhe com quem quiser acessar</small></p>
+                    `;
+                    document.getElementById('tunnel-status').innerHTML = '<p style="color: var(--success);">✅ Tunnel ativo</p>';
+                } else {
+                    document.getElementById('tunnel-status').innerHTML = '<p style="color: var(--error);">❌ Erro ao iniciar tunnel</p>';
+                }
+            } catch (e) {
+                document.getElementById('tunnel-status').innerHTML = `<p style="color: var(--error);">Erro: ${e.message}</p>`;
+            }
+        }
+
+        async function stopTunnel() {
+            try {
+                const resp = await fetch('/api/tunnel/stop', { method: 'POST' });
+                const data = await resp.json();
+                document.getElementById('tunnel-status').innerHTML = '<p style="color: var(--warning);">⚠️ Tunnel parado</p>';
+                document.getElementById('tunnel-url').innerHTML = '';
+            } catch (e) {
+                document.getElementById('tunnel-status').innerHTML = `<p style="color: var(--error);">Erro: ${e.message}</p>`;
             }
         }
 
