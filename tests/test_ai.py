@@ -216,10 +216,10 @@ class TestLocalLLMProvider:
 
     def test_init_custom(self) -> None:
         provider = LocalLLMProvider(
-            host="http://192.168.1.100:11434",
+            host="http://10.0.0.100:11434",
             model="llama3.2:1b",
         )
-        assert provider.host == "http://192.168.1.100:11434"
+        assert provider.host == "http://10.0.0.100:11434"
         assert provider.model == "llama3.2:1b"
 
     @pytest.mark.asyncio
