@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroMind | Painel Inteligente</title>
+    <style>
+        :root {
+            --bg: #0f1115;
+            --glass: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --text: #e5e5e5;
+            --muted: #8e8e93;
+            --accent: #0a84ff;
+            --accent-2: #30d158;
+            --danger: #ff453a;
+            --warning: #ff9f0a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f1115 0%, #1c1f26 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Fundo animado */
+        .bg-orbs {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.35;
+            animation: float 14s infinite ease-in-out;
+        }
+
+        .orb:nth-child(1) {
+            width: 520px;
+            height: 520px;
+            background: radial-gradient(circle, #0a84ff 0%, transparent 70%);
+            top: -160px;
+            left: -120px;
+            animation-delay: 0s;
+        }
+
+        .orb:nth-child(2) {
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle, #bf5af2 0%, transparent 70%);
+            bottom: -120px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        .orb:nth-child(3) {
+            width: 360px;
+            height: 360px;
+            background: radial-gradient(circle, #30d158 0%, transparent 70%);
+            top: 40%;
+            left: 50%;
+            animation-delay: -9s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(60px, -40px) scale(1.1); }
+            66% { transform: translate(-40px, 50px) scale(0.92); }
+        }
+
+        /* Layout */
+        .app {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            grid-template-rows: 64px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: rgba(15, 17, 21, 0.65);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.2px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0a84ff, #bf5af2);
+            display: grid;
+            place-items: center;
+            font-weight: 900;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(10, 132, 255, 0.35);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* Sidebar */
+        aside {
+            padding: 18px 14px;
+            background: rgba(15, 17, 21, 0.45);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: rgba(10, 132, 255, 0.18);
+            color: #fff;
+            border: 1px solid rgba(10, 132, 255, 0.35);
+        }
+
+        .nav-icon {
+            width: 22px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        /* Main */
+        main {
+            padding: 22px 28px;
+            overflow-y: auto;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 18px;
+        }
+
+        /* Glass card */
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 18px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+        }
+
+        .span-12 { grid-column: span 12; }
+        .span-8 { grid-column: span 8; }
+        .span-6 { grid-column: span 6; }
+        .span-4 { grid-column: span 4; }
+        .span-3 { grid-column: span 3; }
+
+        .card-title {
+            font-size: 13px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(48, 209, 88, 0.15);
+            color: var(--accent-2);
+            border: 1px solid rgba(48, 209, 88, 0.35);
+        }
+
+        .badge-warning {
+            background: rgba(255, 159, 10, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(255, 159, 10, 0.35);
+        }
+
+        .badge-danger {
+            background: rgba(255, 69, 58, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(255, 69, 58, 0.35);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 10px currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+        }
+
+        /* Chat */
+        .chat {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 16px;
+            padding: 14px;
+            border: 1px solid var(--glass-border);
+            min-height: 320px;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            margin: 12px 0;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.user { justify-content: flex-end; }
+
+        .bubble {
+            max-width: 75%;
+            padding: 12px 14px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.45;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+        }
+
+        .message.user .bubble {
+            background: rgba(10, 132, 255, 0.25);
+            border-color: rgba(10, 132, 255, 0.45);
+        }
+
+        .meta {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        input, select, textarea {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--glass-border);
+            color: var(--text);
+            padding: 12px 14px;
+            border-radius: 14px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: rgba(10, 132, 255, 0.6);
+            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.12);
+        }
+
+        button {
+            background: linear-gradient(135deg, #0a84ff, #5e5ce6);
+            color: #fff;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 30px rgba(10, 132, 255, 0.35);
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        .mono {
+            font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 999px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-orbs">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <div class="app">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">M</div>
+                <span>MicroMind</span>
+            </div>
+            <div class="header-actions">
+                <span class="badge badge-success"><span class="dot"></span> Online</span>
+                <span class="badge badge-warning" id="providerBadge">Provider: --</span>
+                <span class="mono" id="clock"></span>
+            </div>
+        </header>
+
+        <aside>
+            <div class="nav-item active" onclick="showSection('chat')">
+                <span class="nav-icon">💬</span> Chat
+            </div>
+            <div class="nav-item" onclick="showSection('providers')">
+                <span class="nav-icon">🧠</span> Providers
+            </div>
+            <div class="nav-item" onclick="showSection('cluster')">
+                <span class="nav-icon">🖥️</span> Cluster
+            </div>
+            <div class="nav-item" onclick="showSection('settings')">
+                <span class="nav-icon">⚙️</span> Definições
+            </div>
+        </aside>
+
+        <main>
+            <!-- CHAT -->
+            <section id="chat" class="section active">
+                <div class="grid">
+                    <div class="card span-12">
+                        <div class="card-title">Conversa</div>
+                        <div class="chat" id="chatBox">
+                            <div class="message">
+                                <div class="bubble">Olá! Sou o MicroMind. Como posso ajudar?</div>
+                            </div>
+                        </div>
+                        <div class="input-row">
+                            <input type="text" id="prompt" placeholder="Escreve uma mensagem..." style="flex:1">
+                            <select id="provider">
+                                <option value="microai">MicroAI</option>
+                                <option value="localllm">Local LLM</option>
+                                <option value="rulebased">Rule Based</option>
+                            </select>
+                            <button onclick="enviar()">Enviar</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROVIDERS -->
+            <section id="providers" class="section">
+                <div class="grid">
+                    <div class="card span-4">
+                        <div class="card-title">Provider ativo</div>
+                        <div class="card-value" id="activeProvider">--</div>
+                        <div class="meta" id="providerModel">modelo: --</div>
+                    </div>
+                    <div class="card span-8">
+                        <div class="card-title">Disponíveis</div>
+                        <div id="providersList" style="margin-top:10px"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CLUSTER -->
+            <section id="cluster" class="section">
+                <div class="grid">
+                    <div class="card span-3">
+                        <div class="card-title">Cisco C240</div>
+                        <div class="card-value" style="font-size:20px">API + Frontend</div>
+                        <span class="badge badge-success" style="margin-top:8px"><span class="dot"></span> Online</span>
+                    </div>
+                    <div class="card span-3">
+                        <div class="card-title">HP DL360</div>
+                        <div class="card-value" style="font-size:20px">Hermes + Storage</div>
+                        <span class="badge badge-success" style="margin-top:8px"><span class="dot"></span> Online</span>
+                    </div>
+                    <div class="card span-3">
+                        <div class="card-title">ASUS TUF A15</div>
+                        <div class="card-value" style="font-size:20px">Ollama + GPU</div>
+                        <span class="badge badge-warning" style="margin-top:8px"><span class="dot"></span> Verificando</span>
+                    </div>
+                    <div class="card span-3">
+                        <div class="card-title">Mini PC</div>
+                        <div class="card-value" style="font-size:20px">Proxy + Firewall</div>
+                        <span class="badge badge-success" style="margin-top:8px"><span class="dot"></span> Online</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SETTINGS -->
+            <section id="settings" class="section">
+                <div class="grid">
+                    <div class="card span-8">
+                        <div class="card-title">Conexão</div>
+                        <div class="input-row">
+                            <input type="text" id="apiUrl" value="http://localhost:8081" placeholder="URL da API" style="flex:1">
+                            <button onclick="salvarConfig()">Guardar</button>
+                        </div>
+                        <div class="meta" style="margin-top:10px">URL do MicroMind API.</div>
+                    </div>
+                    <div class="card span-4">
+                        <div class="card-title">Perfil</div>
+                        <div class="card-value" id="profileValue">--</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = localStorage.getItem('micromind_api') || 'http://localhost:8081';
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => {
+                if (n.getAttribute('onclick').includes(id)) n.classList.add('active');
+            });
+
+            if (id === 'providers') carregarProviders();
+            if (id === 'settings') document.getElementById('apiUrl').value = API_URL;
+        }
+
+        async function verificarStatus() {
+            try {
+                const resp = await fetch(API_URL + '/api/health');
+                const dados = await resp.json();
+                document.getElementById('providerBadge').textContent = 'Provider: ' + dados.ai_provider;
+                document.getElementById('profileValue').textContent = dados.profile;
+            } catch (e) {
+                document.getElementById('providerBadge').textContent = 'Provider: offline';
+            }
+        }
+
+        async function carregarProviders() {
+            try {
+                const resp = await fetch(API_URL + '/api/ai/providers');
+                const dados = await resp.json();
+                document.getElementById('activeProvider').textContent = dados.active;
+                document.getElementById('providerModel').textContent = 'modelo: ' + (dados.config.model || '--');
+                document.getElementById('providersList').innerHTML = dados.available.map(p =>
+                    `<div class="badge" style="margin:4px 4px 0 0; background:rgba(255,255,255,0.08); color:#ccc; border:1px solid rgba(255,255,255,0.12)">${p.name} — ${p.desc}</div>`
+                ).join('');
+            } catch (e) {
+                document.getElementById('activeProvider').textContent = 'offline';
+            }
+        }
+
+        async function enviar() {
+            const prompt = document.getElementById('prompt').value;
+            const provider = document.getElementById('provider').value;
+            const chatBox = document.getElementById('chatBox');
+            if (!prompt) return;
+
+            chatBox.innerHTML += `<div class="message user"><div class="bubble">${prompt}</div></div>`;
+            document.getElementById('prompt').value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                await fetch(API_URL + '/api/ai/provider', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({provider})
+                });
+                const resp = await fetch(API_URL + '/api/ai/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({prompt})
+                });
+                const dados = await resp.json();
+                chatBox.innerHTML += `<div class="message"><div class="bubble">${dados.response}<div class="meta">${dados.provider} · ${dados.elapsed_seconds}s</div></div></div>`;
+            } catch (e) {
+                chatBox.innerHTML += `<div class="message"><div class="bubble" style="color:var(--danger)">Erro: ${e.message}</div></div>`;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function salvarConfig() {
+            const url = document.getElementById('apiUrl').value;
+            localStorage.setItem('micromind_api', url);
+            alert('Guardado! A página vai recarregar.');
+            location.reload();
+        }
+
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('pt-PT');
+        }, 1000);
+
+        verificarStatus();
+        setInterval(verificarStatus, 15000);
+    </script>
+</body>
+</html>

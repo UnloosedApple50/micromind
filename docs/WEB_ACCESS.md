@@ -4,7 +4,7 @@
 
 ## Pré-requisitos
 
-1. **O servidor MicroMind deve estar rodando** (no Mac ou servidor)
+1. **O servidor MicroMind deve estar rodando** (em qualquer máquina ou servidor)
 2. **Cloudflare Tunnel ativo** (para acesso externo)
 
 ## Passo a Passo
