@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import re
 from enum import Enum
 from typing import Any, Optional
@@ -93,9 +94,9 @@ class SecurityEngine:
     def validate_path(self, path: str, allowed_base: str) -> bool:
         """Validate path is within allowed base."""
         try:
-            # Normalize paths
-            base = os.path.normpath(allowed_base)
-            target = os.path.normpath(path)
+            # Resolve symlinks and normalize paths
+            base = os.path.realpath(allowed_base)
+            target = os.path.realpath(path)
             # Check if target is within base
             return target == base or target.startswith(base + os.sep)
         except Exception:
